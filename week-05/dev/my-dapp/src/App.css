@@ -1,0 +1,153 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 480px;
+  width: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #fff;
+}
+
+.card {
+  background: #16213e;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.wallet-info {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  word-break: break-all;
+}
+
+.wallet-info .address {
+  color: #64b5f6;
+  font-family: monospace;
+}
+
+.wallet-info .chain {
+  color: #81c784;
+  margin-top: 0.25rem;
+}
+
+.count {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0.5rem 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-connect {
+  background: #4361ee;
+  color: #fff;
+  width: 100%;
+}
+
+.btn-disconnect {
+  background: #e63946;
+  color: #fff;
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.btn-increment {
+  background: #2ec4b6;
+  color: #fff;
+}
+
+.btn-decrement {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.btn-reset {
+  background: #6c757d;
+  color: #fff;
+}
+
+.tx-status {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.tx-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.tx-status.confirming {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.tx-status.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.tx-status.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.loading {
+  color: #a0a0a0;
+  font-style: italic;
+}
+
+.error-text {
+  color: #e63946;
+  font-size: 0.875rem;
+}
