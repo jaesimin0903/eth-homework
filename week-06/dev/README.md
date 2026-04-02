@@ -1,120 +1,123 @@
-# Week 6: 최종 프로젝트 - 나만의 dApp
+# Week 6: Territory Conquest (땅따먹기)
 
-6주간 배운 내용을 총동원하여 나만의 dApp을 만들어보세요!
+ETH 기반 10x10 격자 땅따먹기 게임입니다. 플레이어가 ETH를 지불하여 연결된 영역을 점령하고, 다른 플레이어의 영토를 더 높은 금액으로 빼앗을 수 있습니다.
 
-## 개요
+## 게임 규칙
 
-**자유 주제**로 dApp을 개발합니다. 컨트랙트부터 프론트엔드까지 직접 구현하고, Sepolia 테스트넷에 배포합니다.
+- **점령**: ETH를 지불하면 금액에 비례하여 연결된 칸들을 점령 (칸당 가격 = 총 금액 / 칸 수)
+- **탈취**: 이미 점령된 칸을 빼앗으려면 기존 가격보다 더 높은 금액 필요
+- **환불**: 빼앗긴 플레이어에게 기존 가격의 80% 환불 (pull pattern)
+- **수수료**: 탈취 시 기존 가격의 20%가 컨트랙트 수수료로 축적
+- **전략**: 넓게 퍼지면 방어가 약해지고, 집중하면 방어가 강해지는 트레이드오프
 
-**목표:**
-- 스마트 컨트랙트 설계 및 구현
-- Foundry로 테스트 작성
-- wagmi + RainbowKit으로 프론트엔드 연동
-- Sepolia 배포 및 검증
+## 기술 스택
 
-## 체크리스트
+- **Smart Contract**: Solidity 0.8.26, Foundry
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- **Web3**: wagmi v2, viem v2, RainbowKit v2
+- **Network**: Sepolia Testnet
 
-**반드시 [CHECKLIST.md](./CHECKLIST.md)의 모든 필수 항목을 충족해야 합니다.**
+## 프로젝트 구조
 
-주요 항목:
-- Smart Contract: Solidity 0.8.26+, 상태 변수, public 함수, 이벤트, 테스트 5개+
-- Frontend: Next.js, wagmi, RainbowKit, 컨트랙트 연동, 에러 처리
-- Deployment: Sepolia 배포, 컨트랙트 주소 README 기재
-
-## 아이디어 예시
-
-아이디어가 떠오르지 않는다면 아래 예시를 참고하세요:
-
-### 1. 간단한 투표 시스템
-- 후보자 등록
-- 투표하기 (1인 1표)
-- 결과 조회
-
-```solidity
-// 핵심 기능
-mapping(address => bool) public hasVoted;
-mapping(uint256 => uint256) public votes;
-function vote(uint256 candidateId) external { ... }
+```
+week-06/dev/
+├── src/TerritoryGame.sol       # 땅따먹기 스마트 컨트랙트
+├── test/TerritoryGame.t.sol    # Foundry 테스트 (22개)
+├── script/Deploy.s.sol         # 배포 스크립트
+└── frontend/
+    ├── app/                    # Next.js 페이지
+    ├── components/             # UI 컴포넌트 (GameGrid, Cell, ClaimDialog 등)
+    ├── hooks/                  # wagmi 커스텀 훅
+    ├── lib/connectivity.ts     # Off-chain BFS 연결성 검증
+    └── config/contract.ts      # ABI + 컨트랙트 주소
 ```
 
-### 2. 기부/펀딩 컨트랙트
-- 목표 금액 설정
-- ETH 기부하기
-- 목표 달성 시 수령
+## 설치 및 실행
 
-```solidity
-// 핵심 기능
-uint256 public goal;
-function donate() external payable { ... }
-function withdraw() external { ... }
+### Smart Contract 테스트
+
+```bash
+# 프로젝트 루트에서
+forge test --match-path week-06/dev/test/*.t.sol -vv
 ```
 
-### 3. 메시지 저장소
-- 메시지 작성 (on-chain)
-- 메시지 목록 조회
-- 작성자별 필터링
+### Frontend 실행
 
-```solidity
-// 핵심 기능
-struct Message { address author; string content; uint256 timestamp; }
-Message[] public messages;
-function post(string calldata content) external { ... }
+```bash
+cd week-06/dev/frontend
+npm install
+npm run dev
 ```
 
-### 4. 간단한 NFT 민팅
-- ERC721 기본 구현
-- 민팅 기능
-- 소유자 확인
+http://localhost:3000 에서 확인
 
-```solidity
-// 핵심 기능 (OpenZeppelin 사용 가능)
-function mint() external { ... }
-function tokenURI(uint256 tokenId) public view returns (string memory) { ... }
+### 로컬 Anvil 배포
+
+```bash
+# 터미널 1: Anvil 실행
+anvil
+
+# 터미널 2: 배포
+forge script week-06/dev/script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
 ```
 
-### 5. 에스크로 컨트랙트
-- 구매자가 ETH 예치
-- 판매자가 배송 후 확인
-- 구매자 확인 후 ETH 지급
+### Sepolia 배포
 
-```solidity
-// 핵심 기능
-enum State { Created, Funded, Shipped, Completed }
-State public state;
-function fund() external payable { ... }
-function confirmReceived() external { ... }
+```bash
+# .env에 PRIVATE_KEY 설정 후
+forge script week-06/dev/script/Deploy.s.sol --rpc-url sepolia --broadcast
 ```
 
-## 참고 자료
+## 배포 정보
 
-- [최종 프로젝트 상세 가이드](/eth-materials/week-06/dev/final-project.md)
-- [wagmi 가이드](/eth-materials/week-04/dev/wagmi-basics.md)
-- [RainbowKit 가이드](/eth-materials/week-05/dev/rainbowkit-guide.md)
-- [프론트엔드 템플릿](/eth-materials/resources/frontend-template/)
+- **Network**: Sepolia Testnet
+- **Contract Address**: [`0xb88aB534b88f3C339b531B8038894D2aA1cbC30A`](https://sepolia.etherscan.io/address/0xb88aB534b88f3C339b531B8038894D2aA1cbC30A)
 
-## 제출 방법
+## 스크린샷
 
-1. `week-06/dev/` 폴더에 프로젝트 코드 작성
-2. README.md에 프로젝트 설명, 기술 스택, 컨트랙트 주소 기재
-3. [CHECKLIST.md](./CHECKLIST.md)를 PR 본문에 복사하고 완료 항목 체크
-4. PR 생성
+### 1. 메인 화면 - 지갑 연결 후 초기 상태
+10x10 월드맵과 우측 패널(Test Faucet, My Stats, Leaderboard, Activity Log) 표시
+![메인 화면](./screenshots/image.png)
 
-## 제출 마감
+### 2. 영역 선택 및 점령 다이얼로그
+칸을 선택하면 Claim Territory 다이얼로그에서 비용 확인 후 점령 가능
+![영역 선택](./screenshots/image%20copy.png)
 
-**마감일: [TBD]**
+### 3. MetaMask 트랜잭션 승인
+점령 시 MetaMask에서 ETH 전송 트랜잭션 확인 및 승인
+![트랜잭션 승인](./screenshots/image%20copy%202.png)
 
-마감 후에는 PR을 생성할 수 없습니다. 여유를 두고 미리 제출하세요!
+### 4. 점령 완료 - 내 영토 표시
+트랜잭션 확인 후 점령된 칸이 내 색상으로 표시되고 Leaderboard/Activity Log 업데이트
+![점령 완료](./screenshots/image%20copy%203.png)
 
-## 발표
+### 5. 다른 플레이어의 영토 탈취 시도
+이미 점령된 칸을 선택하면 Takeover details에서 현재 가격을 확인하고 더 높은 금액으로 탈취 가능
+![탈취 시도](./screenshots/image%20copy%204.png)
 
-최종 발표에서 프로젝트를 시연합니다:
-- 5분 발표 + 2분 Q&A
-- 데모 시연 필수
-- 코드 설명 선택
+### 6. 탈취 트랜잭션 진행 중
+Conquering territory... 로딩 표시와 함께 트랜잭션 처리 대기
+![탈취 진행](./screenshots/image%20copy%205.png)
 
----
+### 7. 탈취 완료 - 리더보드 변동
+탈취 성공 후 영토 색상 변경, Leaderboard 순위 업데이트
+![탈취 완료](./screenshots/image%20copy%206.png)
 
-> **응원의 말씀:**
-> 6주간 열심히 달려왔습니다. 마지막 프로젝트는 여러분이 배운 모든 것을 보여줄 기회입니다.
-> 완벽하지 않아도 괜찮습니다. 도전하고, 실패하고, 배우는 과정 자체가 가치 있습니다.
-> 화이팅!
+## 컨트랙트 주요 함수
+
+| 함수 | 설명 |
+|------|------|
+| `claimCells(uint8[])` | 여러 칸을 한 번에 점령 (핵심 함수) |
+| `claimCell(uint8)` | 단일 칸 점령 (편의 함수) |
+| `withdraw()` | 환불금 출금 (pull pattern) |
+| `getFullGrid()` | 전체 격자 상태 조회 |
+| `getPlayerStats(address)` | 플레이어 통계 조회 |
+
+## 사용 방법
+
+1. 지갑 연결 (MetaMask 등)
+2. 10x10 격자에서 점령할 칸들을 클릭하여 선택
+3. 연결된 칸들만 선택 가능 (프론트엔드에서 실시간 검증)
+4. "Claim" 버튼으로 ETH 지불 + 점령 트랜잭션 실행
+5. 리더보드에서 순위 확인
+6. 빼앗긴 경우 "Withdraw" 버튼으로 환불금 수령
